@@ -3,14 +3,25 @@ var app         = express();
 var bodyParser  = require('body-parser');
 var Sentencer   = require('sentencer');
 
+// log requests to the console
+app.use(morgan('dev'));
+
+// configure body parser
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
 nounList = [
     "Laura", "Juan", "Edu"
+];
+
+adjectiveList = [
+
 ];
 
 // Sentencer
 Sentencer.configure({
     // the list of nouns to use. Sentencer provides its own if you don't have one!
-    nounList: nounList,
+    //nounList: nounList,
 
     // the list of adjectives to use. Again, Sentencer comes with one!
     //adjectiveList: [],
