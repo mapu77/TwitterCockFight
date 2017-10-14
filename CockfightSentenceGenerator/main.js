@@ -16,15 +16,16 @@ adjectiveList = [
 
 ];
 
-getSynonims("thing");
+//getRhymes("upc");
 
-function getSynonims(word) {
+function getRhymes(word) {
     // These code snippets use an open-source library. http://unirest.io/nodejs
     unirest.get("https://wordsapiv1.p.mashape.com/words/"+ word +"/rhymes")
         .header("X-Mashape-Key", "AVKRxUWLc8mshXb9sEfDGRZ75q3Ep1xUtmfjsnUmWCDEOTvd6j")
         .header("Accept", "application/json")
         .end(function (result) {
             console.log(result.status, result.headers, result.body);
+            return result.body;
         });
 }
 
@@ -51,6 +52,11 @@ console.log(Sentencer.make("This sentence is from {{ noun }} and {{ an_adjective
 
 app.get('/', function (req, res) {
     res.send('available routes: /rap');
+});
+
+app.get('/rhymes/:word', function (req, res) {
+    var rhymes = getRhymes(req.param.word);
+    res.json(rhymes);
 });
 
 app.post('/rap', function (req, res) {
