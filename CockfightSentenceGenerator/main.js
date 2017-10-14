@@ -8,21 +8,57 @@ var unirest     = require('unirest');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-nounList = [
-    "Laura", "Juan", "Edu"
-];
-
-adjectiveList = [
+var patterns = [
+    {
+        template:   "I´m the {{ noun }} and only that makes you {{ adjective }} and {{ adjective }}." +
+                    "I´m the {{ noun }} and only that beats the {{ nouns }} {{ adjective }}.",
+        description: "Anáfora",
+        base: "File"
+    },
+    {
+        template:   "Don´t fuck with me. you mad fella." +
+                    "Don´t mess with miss. you poor lie-“tella”.",
+        description: "Paralelismo",
+        base: "Noow"
+    },
+    {
+        template:   "If you are on fire, we´ll let you burn."+
+                    "We´ll build the pyre, we´ll let you burn.",
+        description: "Epífora",
+        base: "Crash"
+    },
+    {   template:   "My tongue cuts the air, so sharped, sharped." +
+                    "You should be aware, I fire, fire.",
+        description: "Reduplicación",
+        base: "Noow"
+    },
+    {   template:   "Ring the long run the gong tics it´s song." +
+                    "Melodies sung should boost this sun gang.",
+        description: "Aliteración",
+        base: "Noow"
+    },
+    {   template:   "I can feel your fear, sweat, blood and tears." +
+                    "Tears that fall in deep, like you, ¡dirty shit!",
+        description: "Anadiplosis",
+        base: "Noow"
+    },
+    {   template:   "Shy guy why you are out there hiding." +
+                    "Think shrink ink before the tide gets higher.",
+        description: "Homeoteuleton",
+        base: "Noow"
+    },
+    {   template:   "Your steps back now you sure put." +
+                    "Else you´ll end out in my hood.",
+        description: "Hipérbaton",
+        base: "Noow"
+    }
 
 ];
 
 // Sentencer
-Sentencer.configure({
-    // the list of nouns to use. Sentencer provides its own if you don't have one!
-    //nounList: nounList,
-
-    // the list of adjectives to use. Again, Sentencer comes with one!
-    //adjectiveList: [],
+var configure_options = {
+    nounList: [],
+    adjectiveList: ["hard","soft"],
 
     // additional actions for the template engine to use.
     // you can also redefine the preset actions here if you need to.
@@ -32,10 +68,9 @@ Sentencer.configure({
             return "something";
         }
     }*/
-});
+};
 
-console.log(Sentencer.make("This sentence is from {{ noun }} and {{ an_adjective }} {{ noun }} in it."));
-
+//console.log(Sentencer.make());
 
 app.get('/', function (req, res) {
     res.json({
@@ -52,18 +87,33 @@ app.get('/rhymes/:word', function (req, res) {
         .header("X-Mashape-Key", "AVKRxUWLc8mshXb9sEfDGRZ75q3Ep1xUtmfjsnUmWCDEOTvd6j")
         .header("Accept", "application/json")
         .end(function (result) {
-            //console.log(result.status, result.headers, result.body);
             res.json(result.body);
         });
-
 });
 
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
+}
+
+function pickRandomPattern() {
+    return patterns[getRandomInt(0,patterns.length)];
+}
+
 app.post('/rap', function (req, res) {
-    var wordList = req.body.words;
+    var words = req.body.words;
+
+    // configure Sentencer
+    configure_options.nounList = words;
+    Sentencer.configure(configure_options);
+
+    // generate sentence
+    var pattern = pickRandomPattern();
+    var generated_sentence = Sentencer.make(pattern.template);
 
     res.json({
-        rap: 'pronto funcionará! trusme ;)',
-        words: wordList
+        rap: generated_sentence,
+        words: words,
+        description: pattern.description
     });
 });
 
