@@ -1,78 +1,60 @@
 package org.hackupc.twittercockfight;
 
 
-import android.app.ListActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.twitter.sdk.android.core.Callback;
-import com.twitter.sdk.android.core.Result;
-import com.twitter.sdk.android.core.TwitterCore;
-import com.twitter.sdk.android.core.TwitterException;
-import com.twitter.sdk.android.core.TwitterSession;
-import com.twitter.sdk.android.core.models.Search;
 import com.twitter.sdk.android.core.models.Tweet;
+import com.twitter.sdk.android.tweetui.SearchTimeline;
+import com.twitter.sdk.android.tweetui.TweetTimelineListAdapter;
 
-import org.hackupc.twittercockfight.azure.microsoft.cognitive.query.Documents;
-import org.hackupc.twittercockfight.azure.microsoft.cognitive.KeyPhasesTask;
-import org.hackupc.twittercockfight.twitter.api.TweetsQuery;
+import java.util.ArrayList;
 
-import retrofit2.Call;
+public class RapArenaActivity extends LoginActivity {
 
-public class RapArenaActivity extends ListActivity {
-
-    private TweetsQuery twitterApiClient;
     private TextView textView;
+    private ListView searchListView;
+    private SelectedTweetAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rap_arena);
 
-        TwitterSession session = TwitterCore.getInstance().getSessionManager().getActiveSession();
-        twitterApiClient = new TweetsQuery(session);
-
         textView = (TextView) findViewById(android.R.id.empty);
+
+        searchListView = (ListView) findViewById(android.R.id.list);
+        adapter = new SelectedTweetAdapter(RapArenaActivity.this, new ArrayList<Tweet>());
+        ListView selectedListView = (ListView) findViewById(R.id.list_selected);
+        selectedListView.setAdapter(adapter);
+
         Button button = (Button) findViewById(R.id.search);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 textView.setVisibility(View.VISIBLE);
                 EditText wordsContainer = (EditText) findViewById(R.id.text);
-                String words = wordsContainer.getText().toString();
-                for (String word : words.split(",")) {
-                    lookInTwitter(word);
-                }
+                String word = wordsContainer.getText().toString();
+                searchInTwitterByWord(word, 10);
             }
         });
     }
 
-    private void lookInTwitter(String word) {
-        Call<Search> call = twitterApiClient.getCustomService().list(word);
-        call.enqueue(new Callback<Search>() {
-            @Override
-            public void success(Result<Search> result) {
-                textView.setVisibility(View.INVISIBLE);
-                Documents documents = new Documents();
-                for (Tweet tweet : result.data.tweets) {
-                    documents.add(String.valueOf(tweet.id), tweet.lang, tweet.text);
-                }
-                try {
-                    new KeyPhasesTask().execute(documents);
+    private void searchInTwitterByWord(String word, int count) {
+        SearchTimeline searchTimeline = new SearchTimeline.Builder()
+                .query(word)
+                .maxItemsPerRequest(count)
+                .build();
 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
+        final TweetTimelineListAdapter timelineListAdapter =
+                new SelectableTweetTimelineListAdapter(RapArenaActivity.this, searchTimeline, adapter);
+        searchListView.setAdapter(timelineListAdapter);
 
-            public void failure(TwitterException exception) {
-                //Do something on failure
-                Toast.makeText(RapArenaActivity.this, "Something went wrong", Toast.LENGTH_LONG).show();
-            }
-        });
+
+        textView.setVisibility(View.INVISIBLE);
     }
 }
