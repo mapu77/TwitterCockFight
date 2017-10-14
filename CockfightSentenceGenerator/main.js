@@ -16,19 +16,6 @@ adjectiveList = [
 
 ];
 
-//getRhymes("upc");
-
-function getRhymes(word) {
-    // These code snippets use an open-source library. http://unirest.io/nodejs
-    unirest.get("https://wordsapiv1.p.mashape.com/words/"+ word +"/rhymes")
-        .header("X-Mashape-Key", "AVKRxUWLc8mshXb9sEfDGRZ75q3Ep1xUtmfjsnUmWCDEOTvd6j")
-        .header("Accept", "application/json")
-        .end(function (result) {
-            console.log(result.status, result.headers, result.body);
-            return result.body;
-        });
-}
-
 // Sentencer
 Sentencer.configure({
     // the list of nouns to use. Sentencer provides its own if you don't have one!
@@ -55,8 +42,15 @@ app.get('/', function (req, res) {
 });
 
 app.get('/rhymes/:word', function (req, res) {
-    var rhymes = getRhymes(req.param.word);
-    res.json(rhymes);
+    var word = req.params.word;
+    unirest.get("https://wordsapiv1.p.mashape.com/words/"+ word +"/rhymes")
+        .header("X-Mashape-Key", "AVKRxUWLc8mshXb9sEfDGRZ75q3Ep1xUtmfjsnUmWCDEOTvd6j")
+        .header("Accept", "application/json")
+        .end(function (result) {
+            //console.log(result.status, result.headers, result.body);
+            res.json(result.body);
+        });
+
 });
 
 app.post('/rap', function (req, res) {
