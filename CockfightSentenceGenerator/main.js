@@ -2,6 +2,7 @@ var express     = require('express');
 var app         = express();
 var bodyParser  = require('body-parser');
 var Sentencer   = require('sentencer');
+var unirest     = require('unirest');
 
 // configure body parser
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -15,8 +16,16 @@ adjectiveList = [
 
 ];
 
-function getSynonims(word) {
+getSynonims("thing");
 
+function getSynonims(word) {
+    // These code snippets use an open-source library. http://unirest.io/nodejs
+    unirest.get("https://wordsapiv1.p.mashape.com/words/"+ word +"/rhymes")
+        .header("X-Mashape-Key", "AVKRxUWLc8mshXb9sEfDGRZ75q3Ep1xUtmfjsnUmWCDEOTvd6j")
+        .header("Accept", "application/json")
+        .end(function (result) {
+            console.log(result.status, result.headers, result.body);
+        });
 }
 
 // Sentencer
@@ -45,11 +54,11 @@ app.get('/', function (req, res) {
 });
 
 app.post('/rap', function (req, res) {
-    var wordList = req.body;
+    var wordList = req.body.words;
 
     res.json({
         rap: 'pronto funcionará! trusme ;)',
-        originalwords: wordList
+        words: wordList
     });
 });
 
