@@ -10,6 +10,13 @@ app.use(bodyParser.json());
 
 var custom_noun = "";
 
+// login to wordnik
+unirest.get("http://api.wordnik.com:80/v4/account.json/authenticate/jnssterrass%40gmail.com?password=pandoras&api_key=a2a73e7b926c924fad7001ca3111acd55af2ffabf50eb4ae5\n")
+    .end(function (result) {
+        //console.log(result);
+        console.log(result.body);
+});
+
 var patterns = [
     {
         template:   "I´m the {{ custom_noun }} and only that makes you {{ adjective }}." +
@@ -64,6 +71,16 @@ var configure_options = {
     actions: {
         custom_noun: function(){
             return custom_noun;
+        },
+        custom_adjective: function(){
+            unirest.get("localhost/rhymes/"+custom_noun)
+                .end(function (result) {
+                    var adjetive = Sentencer.make("{{ adjective }}"); // base
+
+                    var rhymes = res.json(result.body);
+
+                    return adjetive;
+                });
         }
     }
 };
@@ -101,11 +118,29 @@ function generateCustomItems() {
     custom_noun = Sentencer.make("{{ noun }}");
 }
 
+function splitWordsByType(keywords) {
+    var classified_keywords = [];
+
+    function getDefinition(value, index, ar) {
+        unirest.get("http://api.wordnik.com:80/v4/word.json/"+value+"/definitions")
+            .header("limit", 1)
+            .header("partOfSpeech", "adjective")
+            .end(function (result) {
+                return result.body;
+            });
+    }
+    keywords.forEach(getDefinition);
+
+    return classified_keywords;
+}
+
 app.post('/rap', function (req, res) {
-    var words = req.body.words;
+    var keywords = req.body.words;
+
+    var classified_keywords = splitWordsByType(keywords);
 
     // configure Sentencer
-    configure_options.nounList = words;
+    configure_options.nounList = keywords;
     Sentencer.configure(configure_options);
 
     // generate sentence
@@ -115,7 +150,7 @@ app.post('/rap', function (req, res) {
 
     res.json({
         rap: generated_sentence,
-        words: words,
+        words: keywords,
         description: pattern.description
     });
 });
