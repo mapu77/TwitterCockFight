@@ -15,7 +15,9 @@ adjectiveList = [
 
 ];
 
-function
+function getSynonims(word) {
+
+}
 
 // Sentencer
 Sentencer.configure({
