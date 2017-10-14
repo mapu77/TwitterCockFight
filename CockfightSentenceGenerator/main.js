@@ -38,7 +38,12 @@ console.log(Sentencer.make("This sentence is from {{ noun }} and {{ an_adjective
 
 
 app.get('/', function (req, res) {
-    res.send('available routes: /rap');
+    res.json({
+        available_routes: [
+            '/rap',
+            '/rhymes/:word',
+        ]
+    });
 });
 
 app.get('/rhymes/:word', function (req, res) {
