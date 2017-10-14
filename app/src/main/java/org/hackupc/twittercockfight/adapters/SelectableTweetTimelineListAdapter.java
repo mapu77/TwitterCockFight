@@ -1,4 +1,4 @@
-package org.hackupc.twittercockfight;
+package org.hackupc.twittercockfight.adapters;
 
 import android.content.Context;
 import android.view.View;
@@ -8,7 +8,7 @@ import com.twitter.sdk.android.core.models.Tweet;
 import com.twitter.sdk.android.tweetui.Timeline;
 import com.twitter.sdk.android.tweetui.TweetTimelineListAdapter;
 
-class SelectableTweetTimelineListAdapter extends TweetTimelineListAdapter {
+public class SelectableTweetTimelineListAdapter extends TweetTimelineListAdapter {
 
     private final SelectedTweetAdapter selectedAdapter;
 

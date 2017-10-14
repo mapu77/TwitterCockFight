@@ -1,4 +1,4 @@
-package org.hackupc.twittercockfight;
+package org.hackupc.twittercockfight.activities;
 
 
 import android.os.Bundle;
@@ -11,6 +11,10 @@ import android.widget.TextView;
 import com.twitter.sdk.android.core.models.Tweet;
 import com.twitter.sdk.android.tweetui.SearchTimeline;
 import com.twitter.sdk.android.tweetui.TweetTimelineListAdapter;
+
+import org.hackupc.twittercockfight.R;
+import org.hackupc.twittercockfight.adapters.SelectableTweetTimelineListAdapter;
+import org.hackupc.twittercockfight.adapters.SelectedTweetAdapter;
 
 import java.util.ArrayList;
 

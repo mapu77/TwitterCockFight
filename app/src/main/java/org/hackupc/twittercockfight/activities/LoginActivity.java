@@ -1,4 +1,4 @@
-package org.hackupc.twittercockfight;
+package org.hackupc.twittercockfight.activities;
 
 import android.content.Context;
 import android.content.Intent;
@@ -11,6 +11,8 @@ import com.twitter.sdk.android.core.Result;
 import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.core.identity.TwitterLoginButton;
+
+import org.hackupc.twittercockfight.R;
 
 
 public class LoginActivity extends AppCompatActivity {
