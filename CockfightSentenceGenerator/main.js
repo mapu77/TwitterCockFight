@@ -3,9 +3,6 @@ var app         = express();
 var bodyParser  = require('body-parser');
 var Sentencer   = require('sentencer');
 
-// log requests to the console
-app.use(morgan('dev'));
-
 // configure body parser
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -43,8 +40,10 @@ app.get('/', function (req, res) {
     res.send('available routes: /rap');
 });
 
-app.get('/rap', function (req, res) {
-    res.send('madafaka!');
+app.post('/rap', function (req, res) {
+    var worldList = req.body;
+
+    res.json({ message: 'json bonicu!' });
 });
 
 app.listen(80, function () {
