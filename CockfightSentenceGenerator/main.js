@@ -45,9 +45,12 @@ app.get('/', function (req, res) {
 });
 
 app.post('/rap', function (req, res) {
-    var worldList = req.body;
+    var wordList = req.body;
 
-    res.json({ rap: 'pronto funcionará! trusme ;)' });
+    res.json({
+        rap: 'pronto funcionará! trusme ;)',
+        originalwords: wordList
+    });
 });
 
 app.listen(80, function () {
