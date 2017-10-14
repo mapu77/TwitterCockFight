@@ -15,6 +15,8 @@ adjectiveList = [
 
 ];
 
+function
+
 // Sentencer
 Sentencer.configure({
     // the list of nouns to use. Sentencer provides its own if you don't have one!
@@ -43,7 +45,7 @@ app.get('/', function (req, res) {
 app.post('/rap', function (req, res) {
     var worldList = req.body;
 
-    res.json({ message: 'json bonicu!' });
+    res.json({ rap: 'pronto funcionará! trusme ;)' });
 });
 
 app.listen(80, function () {
