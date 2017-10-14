@@ -8,10 +8,12 @@ var unirest     = require('unirest');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+var custom_noun = "";
+
 var patterns = [
     {
-        template:   "I´m the {{ noun }} and only that makes you {{ adjective }} and {{ adjective }}." +
-                    "I´m the {{ noun }} and only that beats the {{ nouns }} {{ adjective }}.",
+        template:   "I´m the {{ custom_noun }} and only that makes you {{ adjective }}." +
+                    "I´m the {{ custom_noun }} and only that beats the {{ nouns }} {{ adjective }}.",
         description: "Anáfora",
         base: "File"
     },
@@ -58,16 +60,12 @@ var patterns = [
 // Sentencer
 var configure_options = {
     nounList: [],
-    adjectiveList: ["hard","soft"],
-
-    // additional actions for the template engine to use.
-    // you can also redefine the preset actions here if you need to.
-    // See the "Add your own actions" section below.
-    /*actions: {
-        my_action: function(){
-            return "something";
+    //adjectiveList: ["hard","soft"],
+    actions: {
+        custom_noun: function(){
+            return custom_noun;
         }
-    }*/
+    }
 };
 
 //console.log(Sentencer.make());
@@ -99,6 +97,10 @@ function pickRandomPattern() {
     return patterns[getRandomInt(0,patterns.length)];
 }
 
+function generateCustomItems() {
+    custom_noun = Sentencer.make("{{ noun }}");
+}
+
 app.post('/rap', function (req, res) {
     var words = req.body.words;
 
@@ -107,6 +109,7 @@ app.post('/rap', function (req, res) {
     Sentencer.configure(configure_options);
 
     // generate sentence
+    generateCustomItems();
     var pattern = pickRandomPattern();
     var generated_sentence = Sentencer.make(pattern.template);
 
