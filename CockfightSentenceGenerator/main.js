@@ -124,6 +124,7 @@ function pickRandomPattern() {
 }
 
 function pickRandomIn(elements) {
+    elements.push({word: "fun"});
     return elements[getRandomInt(0, patterns.length)];
 }
 
