@@ -31,6 +31,7 @@ public class SelectableTweetTimelineListAdapter extends TweetTimelineListAdapter
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                selectedAdapter.showButton();
                 selectedAdapter.add(getItem(position));
                 selectedAdapter.notifyDataSetChanged();
             }

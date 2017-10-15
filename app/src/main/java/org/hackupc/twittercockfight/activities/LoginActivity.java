@@ -30,8 +30,9 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void success(Result<TwitterSession> result) {
                 Toast.makeText(applicationContext, "Successfully logged", Toast.LENGTH_LONG).show();
-                Intent intent = new Intent(applicationContext, RapArenaActivity.class);
+                Intent intent = new Intent(applicationContext, MenuActivity.class);
                 startActivity(intent);
+                finish();
             }
 
             @Override
