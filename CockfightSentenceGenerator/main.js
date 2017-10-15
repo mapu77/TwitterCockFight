@@ -144,11 +144,7 @@ function getDescriptionOf(wordObject) {
 
 function getWordsWithRhymeAndRelatedTo(rhymesWith, relatedWord) {
     return new Promise(function (resolve, reject) {
-        unirest.get("https://api.datamuse.com/words")
-            .send('ml',relatedWord.word)
-            .send('rel_rhy', rhymesWith.word)
-            .send('max',1000)
-            //.header("api_key", API_KEY)
+        unirest.get("https://api.datamuse.com/words?ml="+relatedWord.word+"&rel_rhy="+rhymesWith.word+"&max=1000")
             .end(function (result, error) {
                 if (error) reject(result.body[0]);
                 else resolve(result.body[0]);
@@ -210,7 +206,6 @@ function getMostRelevantFrom(words) {
 app.post('/rap', function (req, res) {
     var keywords = req.body.words;
 
-
     var promise = classify(keywords);
     promise.then(function (classified_keywords) {
         // configure Sentencer
@@ -221,6 +216,15 @@ app.post('/rap', function (req, res) {
         // generate sentence
         var most_relevant_noun = getMostRelevantFrom(classified_keywords.nouns);
         var most_relevant_adjective = getMostRelevantFrom(classified_keywords.adjectives);
+
+        var promise = getWordsWithRhymeAndRelatedTo({word: "car"},{word: "driver"});
+        promise.then(function (res) {
+            console.log(res)
+            //classified_keywords.push(res);
+        }, function (error) {
+            console.log(error);
+        });
+
         generateCustomItems(most_relevant_noun,most_relevant_adjective);
         var pattern = pickRandomPattern();
         var generated_sentence = Sentencer.make(pattern.template);
