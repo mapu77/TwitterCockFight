@@ -127,9 +127,9 @@ function generateCustomItems() {
     custom_noun = Sentencer.make("{{ noun }}");
 }
 
-function getDescriptionOf(word) {
+function getDescriptionOf(wordObject) {
     return new Promise(function (resolve, reject) {
-        unirest.get("http://api.wordnik.com:80/v4/word.json/" + word + "/definitions")
+        unirest.get("http://api.wordnik.com:80/v4/word.json/" + wordObject.word + "/definitions")
             .send('limit=1')
             .send('partOfSpeech=adjective')
             .send('includeTags=false')
@@ -143,62 +143,71 @@ function getDescriptionOf(word) {
 }
 
 function classify(keywords) {
-    var promisesArray = [];
-    var classified_keywords = {
-        push: function(description) {
-            switch (description.partOfSpeech ) {
-                case "noun":
-                    this.nouns.push(description);
-                    break;
-                case "adjective":
-                    this.adjectives.push(description);
-                    break;
-                default:
-                    this.other.push(description);
-            }
+    return new Promise(function (resolve, reject) {
+        var promisesArray = [];
+        var classified_keywords = {
+            push: function(description) {
+                switch (description.partOfSpeech ) {
+                    case "noun":
+                        this.nouns.push(description);
+                        break;
+                    case "adjective":
+                        this.adjectives.push(description);
+                        break;
+                    default:
+                        this.other.push(description);
+                }
+            },
+            nouns: [],
+            adjectives: [],
+            other: []
+        };
 
-        },
-        nouns: [],
-        adjectives: [],
-        other: []
-    };
+        for (var i in keywords) {
+            var promise = getDescriptionOf(keywords[i]);
+            promise.then(function (res) {
+                classified_keywords.push(res);
+            }, function (error) {
+                console.log(error);
+            });
+            promisesArray.push(promise);
+        }
 
-    for (var i in keywords) {
-        var promise = getDescriptionOf(keywords[i]);
-        promise.then(function (res) {
-            classified_keywords.push(res);
+        Promise.all(promisesArray).then(function () {
+            resolve(classified_keywords);
+            //console.log(classified_keywords);
         }, function (error) {
-            console.log(error);
+            reject(error);
+            console.log(reason)
         });
-        promisesArray.push(promise);
-    }
-
-    Promise.all(promisesArray).then(function () {
-        return classified_keywords;
-        //console.log(classified_keywords);
-    }, function (reason) {
-        console.log(reason)
     });
 }
 
 app.post('/rap', function (req, res) {
     var keywords = req.body.words;
-    var classified_keywords = classify(keywords);
+    //var classified_keywords = classify(keywords);
 
     // configure Sentencer
-    configure_options.nounList = classified_keywords.nouns;
-    configure_options.adjectives = classified_keywords.adjectives;
-    Sentencer.configure(configure_options);
+    var promise = classify(keywords);
+    promise.then(function (classified_keywords) {
+        configure_options.nounList = classified_keywords.nouns;
+        configure_options.adjectives = classified_keywords.adjectives;
+        Sentencer.configure(configure_options);
 
-    // generate sentence
-    generateCustomItems();
-    var pattern = pickRandomPattern();
-    var generated_sentence = Sentencer.make(pattern.template);
+        // generate sentence
+        generateCustomItems();
+        var pattern = pickRandomPattern();
+        var generated_sentence = Sentencer.make(pattern.template);
 
-    res.json({
-        rap: generated_sentence,
-        words: keywords,
-        description: pattern.description
+        res.json({
+            rap: generated_sentence,
+            words: keywords,
+            classified_keywords: classified_keywords,
+            description: pattern.description
+        });
+    }, function (error) {
+        res.end();
+        console.log(error);
     });
 });
 
