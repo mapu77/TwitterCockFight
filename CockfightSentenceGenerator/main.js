@@ -39,32 +39,32 @@ var patterns = [
         base: "Noow"
     },
     {
-        template: "If you are on {{ custom_noun }}, we´ll let you {{ noun }} rel_adjective ." +
+        template: "If you are on {{ custom_noun }}, we´ll let you {{ noun }} {{rel_adjective}} ." +
         "We´ll build the {{ rhyme_word }}, we´ll let you {{ rhyme_word }}.",
         description: "Epífora",
         base: "Crash"
     },
     {
-        template: "My tongue cuts the air, so sharped, sharped." +
-        "You should be aware, I fire, fire.",
+        template: "My tongue cuts the air, so {{ rhyme_word }}, {{ rhyme_word }}." +
+        "You should be aware, I {{ custom_noun }}, {{ custom_noun }}.",
         description: "Reduplicación",
         base: "Noow"
     },
     {
-        template: "Ring the long run the gong tics it´s song." +
-        "Melodies sung should boost this sun gang.",
+        template: "Ring the {{ custom_noun }} run the gong tics it´s {{ rhyme_word }}." +
+        "Melodies {{ rhyme_word }} should boost this sun {{ rhyme_word }}.",
         description: "Aliteración",
         base: "Noow"
     },
     {
-        template: "I can feel your fear, sweat, blood and tears." +
-        "Tears that fall in deep, like you, ¡dirty shit!",
+        template: "I can feel your {{ custom_noun }}, sweat, blood and {{ rhyme_word }}." +
+        "Tears that fall in {{rel_adjective}}, like you, ¡{{rel_adjective}}!",
         description: "Anadiplosis",
         base: "Noow"
     },
     {
-        template: "Shy guy why you are out there hiding." +
-        "Think shrink ink before the tide gets higher.",
+        template: "Shy guy why you are out there {{ custom_noun }}." +
+        "Think shrink ink before the tide gets {{rel_adjective}}.",
         description: "Homeoteuleton",
         base: "Noow"
     },
