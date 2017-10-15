@@ -123,8 +123,8 @@ function pickRandomPattern() {
     return patterns[getRandomInt(0, patterns.length)];
 }
 
-function generateCustomItems() {
-    custom_noun = Sentencer.make("{{ noun }}");
+function generateCustomItems(most_relevant_noun) {
+    custom_noun = most_relevant_noun;
 }
 
 function getDescriptionOf(wordObject) {
@@ -135,6 +135,20 @@ function getDescriptionOf(wordObject) {
             .send('includeTags=false')
             .send('useCanonical=false')
             .header("api_key", API_KEY)
+            .end(function (result, error) {
+                if (error) reject(result.body[0]);
+                else resolve(result.body[0]);
+            })
+    });
+}
+
+function getWordsWithRhymeAndRelatedTo(rhymesWith, relatedWord) {
+    return new Promise(function (resolve, reject) {
+        unirest.get("https://api.datamuse.com/words")
+            .send('ml',relatedWord.word)
+            .send('rel_rhy', rhymesWith.word)
+            .send('max',1000)
+            //.header("api_key", API_KEY)
             .end(function (result, error) {
                 if (error) reject(result.body[0]);
                 else resolve(result.body[0]);
@@ -183,19 +197,31 @@ function classify(keywords) {
     });
 }
 
+function getMostRelevantFrom(words) {
+    var max = null;
+    for (var i in words) {
+        var word = words[i];
+        if(max === null) max = word;
+        if(max.count < word.count ) max = word;
+    }
+    return max;
+}
+
 app.post('/rap', function (req, res) {
     var keywords = req.body.words;
-    //var classified_keywords = classify(keywords);
 
-    // configure Sentencer
+
     var promise = classify(keywords);
     promise.then(function (classified_keywords) {
+        // configure Sentencer
         configure_options.nounList = classified_keywords.nouns;
         configure_options.adjectives = classified_keywords.adjectives;
         Sentencer.configure(configure_options);
 
         // generate sentence
-        generateCustomItems();
+        var most_relevant_noun = getMostRelevantFrom(classified_keywords.nouns);
+        var most_relevant_adjective = getMostRelevantFrom(classified_keywords.adjectives);
+        generateCustomItems(most_relevant_noun,most_relevant_adjective);
         var pattern = pickRandomPattern();
         var generated_sentence = Sentencer.make(pattern.template);
 
