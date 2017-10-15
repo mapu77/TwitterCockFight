@@ -33,14 +33,14 @@ var patterns = [
         base: "File"
     },
     {
-        template: "Don´t fuck with me. you mad fella." +
-        "Don´t mess with miss. you poor lie-“tella”.",
+        template: "Don´t fuck with me. you mad {{ custom_noun }}." +
+        "Don´t mess with miss. you poor {{ rhyme_word }}.",
         description: "Paralelismo",
         base: "Noow"
     },
     {
-        template: "If you are on fire, we´ll let you burn." +
-        "We´ll build the pyre, we´ll let you burn.",
+        template: "If you are on {{ custom_noun }}, we´ll let you {{ noun }} rel_adjective ." +
+        "We´ll build the {{ rhyme_word }}, we´ll let you {{ rhyme_word }}.",
         description: "Epífora",
         base: "Crash"
     },
