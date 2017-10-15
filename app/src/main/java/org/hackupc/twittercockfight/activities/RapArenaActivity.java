@@ -1,7 +1,9 @@
 package org.hackupc.twittercockfight.activities;
 
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -25,7 +27,8 @@ public class RapArenaActivity extends LoginActivity {
 
     private TextView textView;
     private ListView searchListView;
-    private SelectedTweetAdapter adapter;
+    private SelectedTweetAdapter selectedTweetAdapter;
+    private String rhyme;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,9 +38,24 @@ public class RapArenaActivity extends LoginActivity {
         textView = (TextView) findViewById(android.R.id.empty);
 
         searchListView = (ListView) findViewById(android.R.id.list);
-        adapter = new SelectedTweetAdapter(RapArenaActivity.this, new ArrayList<Tweet>());
-        ListView selectedListView = (ListView) findViewById(R.id.list_selected);
-        selectedListView.setAdapter(adapter);
+        selectedTweetAdapter = new SelectedTweetAdapter(RapArenaActivity.this, new ArrayList<Tweet>());
+        final ListView selectedListView = (ListView) findViewById(R.id.list_selected);
+        FloatingActionButton fabSaveButton = (FloatingActionButton) findViewById(R.id.fab_save);
+        fabSaveButton.setVisibility(View.INVISIBLE);
+        selectedTweetAdapter.setButton(fabSaveButton);
+        fabSaveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                List<Tweet> tweets = selectedTweetAdapter.getItems();
+                SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(textView.getText().toString(), MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                for (Tweet tweet : tweets) {
+                    editor.putString(tweet.idStr, tweet.text);
+                }
+                editor.apply();
+            }
+        });
+        selectedListView.setAdapter(selectedTweetAdapter);
 
         Button button = (Button) findViewById(R.id.search);
         button.setOnClickListener(new View.OnClickListener() {
@@ -58,16 +76,16 @@ public class RapArenaActivity extends LoginActivity {
                 .build();
 
         final TweetTimelineListAdapter timelineListAdapter =
-                new SelectableTweetTimelineListAdapter(RapArenaActivity.this, searchTimeline, adapter);
+                new SelectableTweetTimelineListAdapter(RapArenaActivity.this, searchTimeline, selectedTweetAdapter);
         searchListView.setAdapter(timelineListAdapter);
-
 
         textView.setVisibility(View.INVISIBLE);
     }
 
     public void manageResult(List<String> rhymes) {
         if (rhymes.size() != 0) {
-            searchInTwitterByWord(rhymes.get(new Random().nextInt(rhymes.size())), 10);
+            rhyme = rhymes.get(new Random().nextInt(rhymes.size()));
+            searchInTwitterByWord(rhyme, 10);
         } else {
             textView.setText("No rhymes found");
         }

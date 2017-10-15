@@ -2,6 +2,7 @@ package org.hackupc.twittercockfight.adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +19,7 @@ import java.util.List;
 public class SelectedTweetAdapter extends ArrayAdapter<Tweet> {
 
     private List<Tweet> tweets;
+    private FloatingActionButton button;
 
     public SelectedTweetAdapter(Context context, List<Tweet> tweets) {
         super(context, 0, tweets);
@@ -62,6 +64,19 @@ public class SelectedTweetAdapter extends ArrayAdapter<Tweet> {
     public boolean isEmpty() {
         return tweets.isEmpty();
     }
+
+    public void showButton() {
+        this.button.setVisibility(View.VISIBLE);
+    }
+
+    public void setButton(FloatingActionButton button) {
+        this.button = button;
+    }
+
+    public List<Tweet> getItems() {
+        return tweets;
+    }
+
 
     private class ViewHolder extends RecyclerView.ViewHolder {
 

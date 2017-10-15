@@ -43,7 +43,7 @@ public class RhymesAsyncTask extends AsyncTask<String, Void, List<String>> {
                 response.append(line);
             }
             RhymesResponse rhymesResponse = new Gson().fromJson(response.toString(), RhymesResponse.class);
-            if (rhymesResponse.getRhymes().getAll().size() != 0) {
+            if (rhymesResponse.getRhymes() != null && rhymesResponse.getRhymes().getAll().size() != 0) {
                 rhymes.addAll(rhymesResponse.getRhymes().getAll());
             }
         } catch (IOException e) {
