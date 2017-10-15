@@ -130,7 +130,7 @@ function pickRandomIn(elements) {
 
 function generateCustomItems(most_relevant_keyword_noun, most_relevant_keyword_adjective, related_rhyme_words, rhyme_words, suitable_adjetives) {
     custom_noun = most_relevant_keyword_noun;
-    custom_rel_adjective = pickRandomIn(most_relevant_keyword_adjective);
+    custom_rel_adjective = pickRandomIn([most_relevant_keyword_adjective]);
     custom_rhyme_word = pickRandomIn(rhyme_words);
     custom_related_rhyme = pickRandomIn(related_rhyme_words);
 }
