@@ -15,8 +15,11 @@ import com.twitter.sdk.android.tweetui.TweetTimelineListAdapter;
 import org.hackupc.twittercockfight.R;
 import org.hackupc.twittercockfight.adapters.SelectableTweetTimelineListAdapter;
 import org.hackupc.twittercockfight.adapters.SelectedTweetAdapter;
+import org.hackupc.twittercockfight.rythmes.RhymesAsyncTask;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class RapArenaActivity extends LoginActivity {
 
@@ -43,7 +46,7 @@ public class RapArenaActivity extends LoginActivity {
                 textView.setVisibility(View.VISIBLE);
                 EditText wordsContainer = (EditText) findViewById(R.id.text);
                 String word = wordsContainer.getText().toString();
-                searchInTwitterByWord(word, 10);
+                new RhymesAsyncTask(RapArenaActivity.this).execute(word);
             }
         });
     }
@@ -60,5 +63,13 @@ public class RapArenaActivity extends LoginActivity {
 
 
         textView.setVisibility(View.INVISIBLE);
+    }
+
+    public void manageResult(List<String> rhymes) {
+        if (rhymes.size() != 0) {
+            searchInTwitterByWord(rhymes.get(new Random().nextInt(rhymes.size())), 10);
+        } else {
+            textView.setText("No rhymes found");
+        }
     }
 }

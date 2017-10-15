@@ -10,7 +10,4 @@ public class Documents {
         this.documents = new ArrayList<>();
     }
 
-    public void add(String id, ArrayList<String> keyPhrases) {
-        this.documents.add(new Document(id, keyPhrases));
-    }
 }
