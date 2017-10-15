@@ -76,7 +76,7 @@ var patterns = [
 // Sentencer
 var configure_options = {
     nounList: [],
-    //adjectiveList: ["hard","soft"],
+    adjectiveList: [],
     actions: {
         custom_noun: function () {
             return custom_noun;
@@ -127,7 +127,6 @@ function generateCustomItems() {
     custom_noun = Sentencer.make("{{ noun }}");
 }
 
-
 function getDescriptionOf(word) {
     return new Promise(function (resolve, reject) {
         unirest.get("http://api.wordnik.com:80/v4/word.json/" + word + "/definitions")
@@ -175,7 +174,8 @@ function classify(keywords) {
     }
 
     Promise.all(promisesArray).then(function () {
-        console.log(classified_keywords);
+        return classified_keywords;
+        //console.log(classified_keywords);
     }, function (reason) {
         console.log(reason)
     });
@@ -183,11 +183,11 @@ function classify(keywords) {
 
 app.post('/rap', function (req, res) {
     var keywords = req.body.words;
-
     var classified_keywords = classify(keywords);
 
     // configure Sentencer
-    configure_options.nounList = keywords;
+    configure_options.nounList = classified_keywords.nouns;
+    configure_options.adjectives = classified_keywords.adjectives;
     Sentencer.configure(configure_options);
 
     // generate sentence
