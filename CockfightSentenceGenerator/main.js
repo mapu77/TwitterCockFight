@@ -237,10 +237,13 @@ app.post('/rap', function (req, res) {
         // generate sentence
         var most_relevant_keyword_noun = getMostRelevantFrom(classified_keywords.nouns);
         var most_relevant_keyword_adjective = getMostRelevantFrom(classified_keywords.adjectives);
-        var most_relevant_rhyme_adjective
+        var related_rhyme_words = [];
+        var rhyme_words = [];
+        var suitable_adjetives = [];
 
         var promise = getWordsWithRhymeAndRelatedTo(most_relevant_keyword_noun,most_relevant_keyword_adjective);
         promise.then(function (res) {
+            related_rhyme_words = res;
             console.log(res)
         }, function (error) {
             console.log(error);
@@ -249,6 +252,7 @@ app.post('/rap', function (req, res) {
 
         var promise2 = getWordsThatRhymesWith(most_relevant_keyword_adjective);
         promise2.then(function (res) {
+            rhyme_words = res;
             console.log(res)
         }, function (error) {
             console.log(error);
@@ -257,6 +261,7 @@ app.post('/rap', function (req, res) {
 
         var promise3 = getAdjetivesUsedToDescribe(most_relevant_keyword_noun);
         promise3.then(function (res) {
+            suitable_adjetives = res;
             console.log(res)
         }, function (error) {
             console.log(error);
@@ -264,7 +269,13 @@ app.post('/rap', function (req, res) {
         promisesArray.push(promise3);
 
         Promise.all(promisesArray).then(function () {
-            generateCustomItems(most_relevant_keyword_noun,most_relevant_keyword_adjective);
+            generateCustomItems(
+                most_relevant_keyword_noun,
+                most_relevant_keyword_adjective,
+                related_rhyme_words,
+                rhyme_words,
+                suitable_adjetives);
+
             var pattern = pickRandomPattern();
             var generated_sentence = Sentencer.make(pattern.template);
 
