@@ -146,8 +146,18 @@ function getWordsWithRhymeAndRelatedTo(rhymesWith, relatedWord) {
     return new Promise(function (resolve, reject) {
         unirest.get("https://api.datamuse.com/words?ml="+relatedWord.word+"&rel_rhy="+rhymesWith.word+"&max=1000")
             .end(function (result, error) {
-                if (error) reject(result.body[0]);
-                else resolve(result.body[0]);
+                if (error) reject(error);
+                else resolve(result.body);
+            })
+    });
+}
+
+function getWordsThatRhymesWith(rhymesWith) {
+    return new Promise(function (resolve, reject) {
+        unirest.get("https://api.datamuse.com/words?rel_rhy="+rhymesWith.word+"&max=1000")
+            .end(function (result, error) {
+                if (error) reject(error);
+                else resolve(result.body);
             })
     });
 }
@@ -220,7 +230,13 @@ app.post('/rap', function (req, res) {
         var promise = getWordsWithRhymeAndRelatedTo({word: "car"},{word: "driver"});
         promise.then(function (res) {
             console.log(res)
-            //classified_keywords.push(res);
+        }, function (error) {
+            console.log(error);
+        });
+
+        var promise2 = getWordsThatRhymesWith({word: "cat"});
+        promise2.then(function (res) {
+            console.log(res)
         }, function (error) {
             console.log(error);
         });
