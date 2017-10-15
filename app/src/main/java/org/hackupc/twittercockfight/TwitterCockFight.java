@@ -1,7 +1,6 @@
 package org.hackupc.twittercockfight;
 
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.app.Application;
 import android.util.Log;
 
 import com.twitter.sdk.android.core.DefaultLogger;
@@ -9,12 +8,11 @@ import com.twitter.sdk.android.core.Twitter;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 import com.twitter.sdk.android.core.TwitterConfig;
 
-public class MainActivity extends AppCompatActivity {
-
+public class TwitterCockFight extends Application {
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+    public void onCreate() {
+        super.onCreate();
+
         TwitterConfig config = new TwitterConfig.Builder(this)
                 .logger(new DefaultLogger(Log.DEBUG))
                 .twitterAuthConfig(
