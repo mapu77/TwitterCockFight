@@ -128,7 +128,7 @@ function generateCustomItems() {
 }
 
 
-function myfunction(word) {
+function getDescriptionOf(word) {
     return new Promise(function (resolve, reject) {
         unirest.get("http://api.wordnik.com:80/v4/word.json/" + word + "/definitions")
             .send('limit=1')
@@ -137,20 +137,37 @@ function myfunction(word) {
             .send('useCanonical=false')
             .header("api_key", API_KEY)
             .end(function (result, error) {
-                if (error) reject(result);
-                else resolve(result);
+                if (error) reject(result.body[0]);
+                else resolve(result.body[0]);
             })
     });
 }
 
 function classify(keywords) {
-    var classified_keywords = [];
     var promisesArray = [];
+    var classified_keywords = {
+        push: function(description) {
+            switch (description.partOfSpeech ) {
+                case "noun":
+                    this.nouns.push(description);
+                    break;
+                case "adjective":
+                    this.adjectives.push(description);
+                    break;
+                default:
+                    this.other.push(description);
+            }
+
+        },
+        nouns: [],
+        adjectives: [],
+        other: []
+    };
 
     for (var i in keywords) {
-        var promise = myfunction(keywords[i]);
-        promise.then(function (result) {
-            classified_keywords.push(result.body[0]);
+        var promise = getDescriptionOf(keywords[i]);
+        promise.then(function (res) {
+            classified_keywords.push(res);
         }, function (error) {
             console.log(error);
         });
@@ -162,7 +179,6 @@ function classify(keywords) {
     }, function (reason) {
         console.log(reason)
     });
-
 }
 
 app.post('/rap', function (req, res) {
