@@ -162,6 +162,16 @@ function getWordsThatRhymesWith(rhymesWith) {
     });
 }
 
+function getAdjetivesUsedToDescribe(word) {
+    return new Promise(function (resolve, reject) {
+        unirest.get("https://api.datamuse.com/words?rel_jjb=ocean="+word.word+"&max=1000")
+            .end(function (result, error) {
+                if (error) reject(error);
+                else resolve(result.body);
+            })
+    });
+}
+
 function classify(keywords) {
     return new Promise(function (resolve, reject) {
         var promisesArray = [];
@@ -198,7 +208,7 @@ function classify(keywords) {
             //console.log(classified_keywords);
         }, function (error) {
             reject(error);
-            console.log(reason)
+            console.log(error)
         });
     });
 }
@@ -222,34 +232,50 @@ app.post('/rap', function (req, res) {
         configure_options.nounList = classified_keywords.nouns;
         configure_options.adjectives = classified_keywords.adjectives;
         Sentencer.configure(configure_options);
+        var promisesArray = [];
 
         // generate sentence
-        var most_relevant_noun = getMostRelevantFrom(classified_keywords.nouns);
-        var most_relevant_adjective = getMostRelevantFrom(classified_keywords.adjectives);
+        var most_relevant_keyword_noun = getMostRelevantFrom(classified_keywords.nouns);
+        var most_relevant_keyword_adjective = getMostRelevantFrom(classified_keywords.adjectives);
+        var most_relevant_rhyme_adjective
 
-        var promise = getWordsWithRhymeAndRelatedTo({word: "car"},{word: "driver"});
+        var promise = getWordsWithRhymeAndRelatedTo(most_relevant_keyword_noun,most_relevant_keyword_adjective);
         promise.then(function (res) {
             console.log(res)
         }, function (error) {
             console.log(error);
         });
+        promisesArray.push(promise);
 
-        var promise2 = getWordsThatRhymesWith({word: "cat"});
+        var promise2 = getWordsThatRhymesWith(most_relevant_keyword_adjective);
         promise2.then(function (res) {
             console.log(res)
         }, function (error) {
             console.log(error);
         });
+        promisesArray.push(promise2);
 
-        generateCustomItems(most_relevant_noun,most_relevant_adjective);
-        var pattern = pickRandomPattern();
-        var generated_sentence = Sentencer.make(pattern.template);
+        var promise3 = getAdjetivesUsedToDescribe(most_relevant_keyword_noun);
+        promise3.then(function (res) {
+            console.log(res)
+        }, function (error) {
+            console.log(error);
+        });
+        promisesArray.push(promise3);
 
-        res.json({
-            rap: generated_sentence,
-            words: keywords,
-            classified_keywords: classified_keywords,
-            description: pattern.description
+        Promise.all(promisesArray).then(function () {
+            generateCustomItems(most_relevant_keyword_noun,most_relevant_keyword_adjective);
+            var pattern = pickRandomPattern();
+            var generated_sentence = Sentencer.make(pattern.template);
+
+            res.json({
+                rap: generated_sentence,
+                words: keywords,
+                classified_keywords: classified_keywords,
+                description: pattern.description
+            });
+        }, function (error) {
+            console.log(error)
         });
     }, function (error) {
         res.end();
