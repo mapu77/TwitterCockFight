@@ -11,6 +11,10 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
 var custom_noun = "";
+var custom_rel_adjective = "";
+var custom_rhyme_word = "";
+var custom_related_rhyme = "";
+
 const API_KEY = "a2a73e7b926c924fad7001ca3111acd55af2ffabf50eb4ae5";
 
 // login to wordnik
@@ -23,8 +27,8 @@ unirest.get("http://api.wordnik.com:80/v4/account.json/authenticate/jnssterrass%
 
 var patterns = [
     {
-        template: "I´m the {{ custom_noun }} and only that makes you {{ adjective }}." +
-        "I´m the {{ custom_noun }} and only that beats the {{ nouns }} {{ adjective }}.",
+        template: "I´m the {{ custom_noun }} and only that makes you feel like {{ rel_adjective }}." +
+        "I´m the {{ custom_noun }} and only that beats the {{ adjective }} {{ rhyme_word }}.",
         description: "Anáfora",
         base: "File"
     },
@@ -79,17 +83,13 @@ var configure_options = {
     adjectiveList: [],
     actions: {
         custom_noun: function () {
-            return custom_noun;
+            return custom_noun.word;
         },
-        custom_adjective: function () {
-            unirest.get("localhost/rhymes/" + custom_noun)
-                .end(function (result) {
-                    var adjetive = Sentencer.make("{{ adjective }}"); // base
-
-                    var rhymes = res.json(result.body);
-
-                    return adjetive;
-                });
+        rel_adjective: function () {
+            return custom_rel_adjective.word;
+        },
+        rhyme_word: function () {
+            return custom_rhyme_word.word;
         }
     }
 };
@@ -123,8 +123,15 @@ function pickRandomPattern() {
     return patterns[getRandomInt(0, patterns.length)];
 }
 
-function generateCustomItems(most_relevant_noun) {
-    custom_noun = most_relevant_noun;
+function pickRandomIn(elements) {
+    return elements[getRandomInt(0, patterns.length)];
+}
+
+function generateCustomItems(most_relevant_keyword_noun, most_relevant_keyword_adjective, related_rhyme_words, rhyme_words, suitable_adjetives) {
+    custom_noun = most_relevant_keyword_noun;
+    custom_rel_adjective = pickRandomIn(most_relevant_keyword_adjective);
+    custom_rhyme_word = pickRandomIn(rhyme_words);
+    custom_related_rhyme = pickRandomIn(related_rhyme_words);
 }
 
 function getDescriptionOf(wordObject) {
@@ -281,8 +288,8 @@ app.post('/rap', function (req, res) {
 
             res.json({
                 rap: generated_sentence,
-                words: keywords,
-                classified_keywords: classified_keywords,
+                //words: keywords,
+                //classified_keywords: classified_keywords,
                 description: pattern.description
             });
         }, function (error) {
